@@ -1,3 +1,5 @@
+# Direnv.
+.envrc
 # Virtual environment.
 venv/
 # Compiled bytecode.
