@@ -1,0 +1,7 @@
+# Virtual environment.
+venv/
+# Compiled bytecode.
+__pycache__/
+# Build artifacts.
+dist/
+*.egg-info/
