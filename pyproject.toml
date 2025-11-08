@@ -7,7 +7,9 @@ authors = [
     { name = "benj9000", email = "49900294+benj9000@users.noreply.github.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "requests>=2.32.5",
+]
 
 [project.scripts]
 lottery-numbers = "lottery_numbers.cli:main"
