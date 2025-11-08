@@ -10,7 +10,7 @@ requires-python = ">=3.14"
 dependencies = []
 
 [project.scripts]
-lottery-numbers = "lottery_numbers:main"
+lottery-numbers = "lottery_numbers.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.8.23,<0.9.0"]
