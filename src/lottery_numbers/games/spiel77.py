@@ -1,0 +1,93 @@
+from enum import IntEnum
+from typing import ClassVar, override
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from lottery_numbers.draw.draw import Draw
+from lottery_numbers.ticket.ticket import TicketNumber
+
+
+class Spiel77Evaluator:
+    """Evaluator for Spiel 77 lottery tickets."""
+
+    def evaluate(self, ticket_number: TicketNumber, draw: Draw) -> Spiel77Evaluation:
+        """Evaluate a Spiel 77 ticket against a draw."""
+        matched_digits: int = self._count_matching_digits_from_right(
+            ticket_number.game77_number, draw.game77_number
+        )
+        return Spiel77Evaluation(matched_digits=matched_digits)
+
+    @staticmethod
+    def _count_matching_digits_from_right(ticket_number: str, winning_number: str) -> int:
+        """Count how many digits match from right to left consecutively."""
+        count: int = 0
+        for t_digit, w_digit in zip(reversed(ticket_number), reversed(winning_number)):
+            if t_digit == w_digit:
+                count += 1
+            else:
+                break
+        return count
+
+
+class Spiel77Evaluation(BaseModel):
+    """An evaluation of a Spiel 77 ticket."""
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True)
+
+    matched_digits: int = Field(
+        ge=0, le=7, description="Number of matching digits from right to left."
+    )
+
+    @property
+    def winning_class(self) -> Spiel77WinningClass:
+        """The winning class."""
+        return Spiel77WinningClass.from_consecutive_matches(self.matched_digits)
+
+    @property
+    def is_winner(self) -> bool:
+        """Check if this is a winning combination."""
+        return self.winning_class is not Spiel77WinningClass.NO_WIN
+
+    @override
+    def __str__(self) -> str:
+        if not self.is_winner:
+            return "No win (0 matching digits)"
+
+        class_num: str = self.winning_class.name.replace("CLASS_", "")
+        return f"✨ WIN  Class {class_num} ({self.winning_class.description})"
+
+
+class Spiel77WinningClass(IntEnum):
+    """Winning classes for Spiel 77."""
+
+    CLASS_1 = 1
+    CLASS_2 = 2
+    CLASS_3 = 3
+    CLASS_4 = 4
+    CLASS_5 = 5
+    CLASS_6 = 6
+    CLASS_7 = 7
+    NO_WIN = 999  # Not an official winning class.
+
+    @property
+    def description(self) -> str:
+        descriptions = {
+            1: "7 correct digits",
+            2: "6 correct digits",
+            3: "5 correct digits",
+            4: "4 correct digits",
+            5: "3 correct digits",
+            6: "2 correct digits",
+            7: "1 correct digit",
+            999: "0 correct digits",
+        }
+        return descriptions[self.value]
+
+    @classmethod
+    def from_consecutive_matches(cls, matches_count: int) -> Spiel77WinningClass:
+        """Create a winning class from the number of consecutively matching digits."""
+        if matches_count < 0 or matches_count > 7:
+            raise ValueError("Invalid number of matching digits.")
+        if matches_count == 0:
+            return cls.NO_WIN
+        return cls(8 - matches_count)
