@@ -12,11 +12,11 @@ class TicketRepositoryConfig:
     """Repository that manages lottery ticket data using a configuration file."""
 
     def __init__(self, config_file_path: Path):
-        self.config: ConfigProtocol = self._load_config(config_file_path)
-        self.mapper: TicketMapper = TicketMapper()
+        self._config: ConfigProtocol = self._load_config(config_file_path)
+        self._mapper: TicketMapper = TicketMapper()
 
     def get_for_date(self, draw_date: date) -> Ticket:
-        return self.mapper.to_ticket(self.config, draw_date)
+        return self._mapper.to_ticket(self._config, draw_date)
 
     @staticmethod
     def _load_config(config_file_path: Path) -> ConfigProtocol:

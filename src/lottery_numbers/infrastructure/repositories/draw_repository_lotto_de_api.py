@@ -14,12 +14,12 @@ class DrawRepositoryLottoDeApi:
     """Repository that manages lottery draw data using LOTTO.de's API."""
 
     def __init__(self):
-        self.mapper: DrawMapper = DrawMapper()
+        self._mapper: DrawMapper = DrawMapper()
 
     def get_for_date(self, draw_date: date) -> Draw:
         url: str = self._build_url(draw_date)
         response: ApiResponse = self._fetch(url)
-        draws: list[Draw] = self.mapper.to_draws(response)
+        draws: list[Draw] = self._mapper.to_draws(response)
         if len(draws) == 0:
             raise DrawNotFoundError(draw_date)
         if len(draws) > 1:

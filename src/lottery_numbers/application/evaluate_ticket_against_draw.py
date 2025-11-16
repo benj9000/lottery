@@ -16,12 +16,12 @@ class EvaluateTicketAgainstDraw:
         draw_repo: DrawRepository,
         ticket_evaluator: TicketEvaluator,
     ):
-        self.ticket_repo: TicketRepository = ticket_repo
-        self.draw_repo: DrawRepository = draw_repo
-        self.ticket_evaluator: TicketEvaluator = ticket_evaluator
+        self._ticket_repo: TicketRepository = ticket_repo
+        self._draw_repo: DrawRepository = draw_repo
+        self._ticket_evaluator: TicketEvaluator = ticket_evaluator
 
     def execute(self, draw_date: date) -> TicketEvaluation:
-        ticket: Ticket = self.ticket_repo.get_for_date(draw_date)
-        draw: Draw = self.draw_repo.get_for_date(draw_date)
-        evaluation: TicketEvaluation = self.ticket_evaluator.evaluate(ticket, draw)
+        ticket: Ticket = self._ticket_repo.get_for_date(draw_date)
+        draw: Draw = self._draw_repo.get_for_date(draw_date)
+        evaluation: TicketEvaluation = self._ticket_evaluator.evaluate(ticket, draw)
         return evaluation
