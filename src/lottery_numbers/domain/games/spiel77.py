@@ -13,7 +13,7 @@ class Spiel77Evaluator:
     def evaluate(self, ticket_number: TicketNumber, draw: Draw) -> Spiel77Evaluation:
         """Evaluate a Spiel 77 ticket against a draw."""
         matched_digits: int = self._count_matching_digits_from_right(
-            ticket_number.game77_number, draw.game77_number
+            ticket_number.spiel77_number, draw.spiel77_number
         )
         return Spiel77Evaluation(matched_digits=matched_digits)
 

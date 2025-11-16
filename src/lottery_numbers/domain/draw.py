@@ -23,11 +23,11 @@ class Draw(BaseModel):
     ]
     super_number: int = Field(ge=0, le=9, description="The winning super number for LOTTO 6aus49.")
 
-    game77_number: str = Field(
-        pattern=r"^\d{7}$", description="The winning 7-digit number for Game 77."
+    spiel77_number: str = Field(
+        pattern=r"^\d{7}$", description="The winning 7-digit number for Spiel 77."
     )
     super6_number: str = Field(
-        pattern=r"^\d{6}$", description="The winning 6-digit number for Super 6."
+        pattern=r"^\d{6}$", description="The winning 6-digit number for SUPER 6."
     )
 
     @override
@@ -48,7 +48,7 @@ class Draw(BaseModel):
             f"  Winning Numbers:  {numbers_formatted}",
             f"  Super Number:     [ {self.super_number} ]",
             "",
-            f"Spiel 77:   {'-'.join(self.game77_number)}",
+            f"Spiel 77:   {'-'.join(self.spiel77_number)}",
             f"SUPER 6:    {'-'.join(self.super6_number)}",
         ]
 

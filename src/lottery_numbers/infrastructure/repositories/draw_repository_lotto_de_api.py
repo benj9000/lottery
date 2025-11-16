@@ -74,7 +74,7 @@ class DrawMapper:
                 item.drawNumber for item in draw_response.drawNumbersCollection
             ],  # pyright: ignore [reportArgumentType]
             super_number=draw_response.superNumber,
-            game77_number=draw_response.game77.numbers,
+            spiel77_number=draw_response.game77.numbers,
             super6_number=draw_response.super6.numbers,
         )
 

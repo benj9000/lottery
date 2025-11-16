@@ -63,13 +63,13 @@ class TicketNumber(BaseModel):
         return self.number[-1]
 
     @property
-    def game77_number(self) -> str:
-        """Get the full 7-digit number for Game 77."""
+    def spiel77_number(self) -> str:
+        """Get the full 7-digit number for Spiel 77."""
         return self.number
 
     @property
     def super6_number(self) -> str:
-        """Get the last 6 digits for Super 6."""
+        """Get the last 6 digits for SUPER 6."""
         return self.number[-6:]
 
     @override

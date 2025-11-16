@@ -16,7 +16,7 @@ class TicketEvaluator:
     def __init__(self) -> None:
         """Initialize the ticket evaluator with game-specific evaluators."""
         self._lotto_6aus49_evaluator: Lotto6aus49Evaluator = Lotto6aus49Evaluator()
-        self._game77_evaluator: Spiel77Evaluator = Spiel77Evaluator()
+        self._spiel77_evaluator: Spiel77Evaluator = Spiel77Evaluator()
         self._super6_evaluator: Super6Evaluator = Super6Evaluator()
 
     def evaluate(self, ticket: Ticket, draw: Draw) -> TicketEvaluation:
@@ -41,7 +41,7 @@ class TicketEvaluator:
         # Evaluate Spiel 77 if played.
         spiel77_evaluation: Spiel77Evaluation | None = None
         if ticket.play_spiel77:
-            spiel77_evaluation = self._game77_evaluator.evaluate(ticket.ticket_number, draw)
+            spiel77_evaluation = self._spiel77_evaluator.evaluate(ticket.ticket_number, draw)
 
         # Evaluate SUPER 6 if played.
         super6_evaluation: Super6Evaluation | None = None
@@ -50,7 +50,7 @@ class TicketEvaluator:
 
         return TicketEvaluation(
             lotto_6aus49_evaluation=lotto_6aus49_evaluations,
-            game77_evaluation=spiel77_evaluation,
+            spiel77_evaluation=spiel77_evaluation,
             super6_evaluation=super6_evaluation,
         )
 
@@ -63,7 +63,7 @@ class TicketEvaluation(BaseModel):
     lotto_6aus49_evaluation: list[Lotto6aus49Evaluation] = Field(
         description="LOTTO 6aus49 evaluation for each pick on the ticket."
     )
-    game77_evaluation: Spiel77Evaluation | None = Field(
+    spiel77_evaluation: Spiel77Evaluation | None = Field(
         default=None, description="Spiel 77 evaluation if played."
     )
     super6_evaluation: Super6Evaluation | None = Field(
@@ -74,9 +74,9 @@ class TicketEvaluation(BaseModel):
     def has_any_win(self) -> bool:
         """Check if there are any wins across all games."""
         lotto_6aus49_win = any(eval.is_winner for eval in self.lotto_6aus49_evaluation)
-        game77_win = self.game77_evaluation.is_winner if self.game77_evaluation else False
+        spiel77_win = self.spiel77_evaluation.is_winner if self.spiel77_evaluation else False
         super6_win = self.super6_evaluation.is_winner if self.super6_evaluation else False
-        return lotto_6aus49_win or game77_win or super6_win
+        return lotto_6aus49_win or spiel77_win or super6_win
 
     @override
     def __str__(self) -> str:
@@ -102,11 +102,11 @@ class TicketEvaluation(BaseModel):
                 lines.append("")
 
         # Add Spiel 77 evaluation if played.
-        if self.game77_evaluation:
+        if self.spiel77_evaluation:
             lines.append("")
             lines.append("Spiel 77 Evaluation")
             lines.append("─" * width)
-            lines.append(f"  {self.game77_evaluation}")
+            lines.append(f"  {self.spiel77_evaluation}")
 
         # Add SUPER 6 evaluation if played.
         if self.super6_evaluation:
@@ -125,7 +125,7 @@ class TicketEvaluation(BaseModel):
             if any(r.is_winner for r in self.lotto_6aus49_evaluation):
                 winning_games.append("LOTTO 6aus49")
 
-            if self.game77_evaluation and self.game77_evaluation.is_winner:
+            if self.spiel77_evaluation and self.spiel77_evaluation.is_winner:
                 winning_games.append("Spiel 77")
 
             if self.super6_evaluation and self.super6_evaluation.is_winner:
