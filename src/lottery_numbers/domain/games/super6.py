@@ -39,22 +39,21 @@ class Super6Evaluation(BaseModel):
     )
 
     @property
-    def winning_class(self) -> Super6WinningClass:
-        """The winning class."""
+    def winning_class(self) -> Super6WinningClass | None:
+        """The winning class, if any."""
         return Super6WinningClass.from_consecutive_matches(self.matched_digits)
 
     @property
     def is_winner(self) -> bool:
         """Check if this is a winning combination."""
-        return self.winning_class is not Super6WinningClass.NO_WIN
+        return self.winning_class is not None
 
     @override
     def __str__(self) -> str:
-        if not self.is_winner:
+        if self.winning_class is None:
             return "No win (0 matching digits)"
 
-        class_num: str = self.winning_class.name.replace("CLASS_", "")
-        return f"✨ WIN  Class {class_num} ({self.winning_class.description})"
+        return f"✨ WIN  Class {self.winning_class} ({self.winning_class.description})"
 
 
 class Super6WinningClass(IntEnum):
@@ -66,7 +65,6 @@ class Super6WinningClass(IntEnum):
     CLASS_4 = 4
     CLASS_5 = 5
     CLASS_6 = 6
-    NO_WIN = 999  # Not an official winning class.
 
     @property
     def description(self) -> str:
@@ -77,15 +75,14 @@ class Super6WinningClass(IntEnum):
             4: "3 correct digits",
             5: "2 correct digits",
             6: "1 correct digit",
-            999: "0 correct digits",
         }
         return descriptions[self.value]
 
     @classmethod
-    def from_consecutive_matches(cls, matches_count: int) -> Super6WinningClass:
+    def from_consecutive_matches(cls, matches_count: int) -> Super6WinningClass | None:
         """Create a winning class from the number of consecutively matching digits."""
         if matches_count < 0 or matches_count > 6:
             raise ValueError("Invalid number of matching digits.")
         if matches_count == 0:
-            return cls.NO_WIN
+            return None
         return cls(7 - matches_count)

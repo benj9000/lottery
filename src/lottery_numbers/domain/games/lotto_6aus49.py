@@ -35,8 +35,8 @@ class Lotto6aus49Evaluation(BaseModel):
     super_number_matched: bool = Field(description="Whether the super number matched.")
 
     @property
-    def winning_class(self) -> Lotto6aus49WinningClass:
-        """The winning class."""
+    def winning_class(self) -> Lotto6aus49WinningClass | None:
+        """The winning class, if any."""
         return Lotto6aus49WinningClass.from_match_data(
             len(self.matching_numbers), self.super_number_matched
         )
@@ -44,24 +44,29 @@ class Lotto6aus49Evaluation(BaseModel):
     @property
     def is_winner(self) -> bool:
         """Check if this is a winning combination."""
-        return self.winning_class is not Lotto6aus49WinningClass.NO_WIN
+        return self.winning_class is not None
 
     @override
     def __str__(self) -> str:
-        if not self.is_winner:
-            return "No win (0 matching numbers)"
+        lines: list[str] = []
+        matches_count: int = len(self.matching_numbers)
 
-        # Format matched numbers.
-        sorted_matches: list[int] = sorted(self.matching_numbers)
-        matches_formatted: str = "".join(f"[ {num:2d} ]" for num in sorted_matches)
+        # Winning class line.
+        if self.winning_class is None:
+            super_text: str = " + super number" if self.super_number_matched else ""
+            plural_s: str = "s" if matches_count != 1 else ""
+            lines.append(f"No win ({matches_count} number{plural_s}{super_text})")
+        else:
+            lines.append(f"✨ WIN  Class {self.winning_class} ({self.winning_class.description})")
 
-        winning_class_line: str = f"✨ WIN  Class {self.winning_class.name.replace('CLASS_', '')} ({self.winning_class.description})"
-        match_line: str = f"         Matched: {matches_formatted}"
+        # Matched numbers line.
+        if matches_count > 0:
+            matches_text: str = (
+                "".join(f"[ {num:2d} ]" for num in sorted(self.matching_numbers)) or "–"
+            )
+            lines.append(f"         Matched: {matches_text}")
 
-        if self.super_number_matched:
-            match_line += " + super number"
-
-        return f"{winning_class_line}\n{match_line}"
+        return "\n".join(lines)
 
 
 class Lotto6aus49WinningClass(IntEnum):
@@ -76,7 +81,6 @@ class Lotto6aus49WinningClass(IntEnum):
     CLASS_7 = 7
     CLASS_8 = 8
     CLASS_9 = 9
-    NO_WIN = 999  # Not an official winning class.
 
     @property
     def description(self) -> str:
@@ -90,14 +94,13 @@ class Lotto6aus49WinningClass(IntEnum):
             7: "3 numbers + super number",
             8: "3 numbers",
             9: "2 numbers + super number",
-            999: "0 numbers",
         }
         return descriptions[self.value]
 
     @classmethod
     def from_match_data(
         cls, matches_count: int, super_number_matched: bool
-    ) -> Lotto6aus49WinningClass:
+    ) -> Lotto6aus49WinningClass | None:
         """
         Create a winning class from the number of matching numbers and whether the super number is a
         match.
@@ -116,4 +119,4 @@ class Lotto6aus49WinningClass(IntEnum):
             (3, False): cls.CLASS_8,
             (2, True): cls.CLASS_9,
         }
-        return mapping.get((matches_count, super_number_matched)) or cls.NO_WIN
+        return mapping.get((matches_count, super_number_matched)) or None

@@ -39,22 +39,21 @@ class Spiel77Evaluation(BaseModel):
     )
 
     @property
-    def winning_class(self) -> Spiel77WinningClass:
-        """The winning class."""
+    def winning_class(self) -> Spiel77WinningClass | None:
+        """The winning class, if any."""
         return Spiel77WinningClass.from_consecutive_matches(self.matched_digits)
 
     @property
     def is_winner(self) -> bool:
         """Check if this is a winning combination."""
-        return self.winning_class is not Spiel77WinningClass.NO_WIN
+        return self.winning_class is not None
 
     @override
     def __str__(self) -> str:
-        if not self.is_winner:
+        if self.winning_class is None:
             return "No win (0 matching digits)"
 
-        class_num: str = self.winning_class.name.replace("CLASS_", "")
-        return f"✨ WIN  Class {class_num} ({self.winning_class.description})"
+        return f"✨ WIN  Class {self.winning_class} ({self.winning_class.description})"
 
 
 class Spiel77WinningClass(IntEnum):
@@ -67,7 +66,6 @@ class Spiel77WinningClass(IntEnum):
     CLASS_5 = 5
     CLASS_6 = 6
     CLASS_7 = 7
-    NO_WIN = 999  # Not an official winning class.
 
     @property
     def description(self) -> str:
@@ -79,15 +77,14 @@ class Spiel77WinningClass(IntEnum):
             5: "3 correct digits",
             6: "2 correct digits",
             7: "1 correct digit",
-            999: "0 correct digits",
         }
         return descriptions[self.value]
 
     @classmethod
-    def from_consecutive_matches(cls, matches_count: int) -> Spiel77WinningClass:
+    def from_consecutive_matches(cls, matches_count: int) -> Spiel77WinningClass | None:
         """Create a winning class from the number of consecutively matching digits."""
         if matches_count < 0 or matches_count > 7:
             raise ValueError("Invalid number of matching digits.")
         if matches_count == 0:
-            return cls.NO_WIN
+            return None
         return cls(8 - matches_count)
