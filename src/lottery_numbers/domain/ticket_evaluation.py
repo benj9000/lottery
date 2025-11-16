@@ -2,11 +2,11 @@ from typing import ClassVar, override
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from lottery_numbers.draw.draw import Draw
-from lottery_numbers.games.lotto_6aus49 import Lotto6aus49Evaluation, Lotto6aus49Evaluator
-from lottery_numbers.games.spiel77 import Spiel77Evaluation, Spiel77Evaluator
-from lottery_numbers.games.super6 import Super6Evaluation, Super6Evaluator
-from lottery_numbers.ticket.ticket import Ticket
+from lottery_numbers.domain.draw import Draw
+from lottery_numbers.domain.games.lotto_6aus49 import Lotto6aus49Evaluation, Lotto6aus49Evaluator
+from lottery_numbers.domain.games.spiel77 import Spiel77Evaluation, Spiel77Evaluator
+from lottery_numbers.domain.games.super6 import Super6Evaluation, Super6Evaluator
+from lottery_numbers.domain.ticket import Ticket
 from lottery_numbers.utils import center_text
 
 

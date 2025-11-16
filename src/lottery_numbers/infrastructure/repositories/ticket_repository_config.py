@@ -5,10 +5,10 @@ from pathlib import Path
 from types import ModuleType
 from typing import Protocol, cast, get_type_hints
 
-from lottery_numbers.ticket.ticket import Lotto6aus49Pick, Ticket, TicketNumber
+from lottery_numbers.domain.ticket import Lotto6aus49Pick, Ticket, TicketNumber
 
 
-class ConfigRepository:
+class TicketRepositoryConfig:
     """Repository that manages lottery ticket data using a configuration file."""
 
     def __init__(self, config_file_path: Path):

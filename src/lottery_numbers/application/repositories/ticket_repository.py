@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Protocol
 
-from lottery_numbers.ticket.ticket import Ticket
+from lottery_numbers.domain.ticket import Ticket
 
 
 class TicketRepository(Protocol):

@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Protocol
 
-from lottery_numbers.draw.draw import Draw
+from lottery_numbers.domain.draw import Draw
 
 
 class DrawRepository(Protocol):

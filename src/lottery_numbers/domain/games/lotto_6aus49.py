@@ -3,8 +3,8 @@ from typing import ClassVar, override
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from lottery_numbers.draw.draw import Draw
-from lottery_numbers.ticket.ticket import Lotto6aus49Pick, TicketNumber
+from lottery_numbers.domain.draw import Draw
+from lottery_numbers.domain.ticket import Lotto6aus49Pick, TicketNumber
 
 
 class Lotto6aus49Evaluator:
