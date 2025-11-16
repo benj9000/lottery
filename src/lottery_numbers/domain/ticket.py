@@ -10,10 +10,10 @@ class Ticket(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=False)
 
     ticket_number: TicketNumber
+    draw_date: date = Field(description="The date of the draw this ticket is for.")
     lotto_6aus49_picks: list[Lotto6aus49Pick] = Field(
         min_length=1, description="One or more picks for LOTTO 6aus49."
     )
-    draw_date: date = Field(description="The date of the draw this ticket is for.")
     play_spiel77: bool = Field(description="Whether to participate in Spiel 77.")
     play_super6: bool = Field(description="Whether to participate in SUPER 6.")
 
@@ -35,7 +35,7 @@ class Ticket(BaseModel):
         for idx, pick in enumerate(self.lotto_6aus49_picks, start=1):
             lines.append(f"  Pick {idx}:  {pick}")
 
-        # Add additional games if any.
+        # Add additional games, if any.
         additional_games: list[str] = []
         if self.play_spiel77:
             additional_games.append("Spiel 77")
