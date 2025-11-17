@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 import requests
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, PastDatetime, RootModel
 
-from lottery_numbers.application.repositories.draw_repository import DrawNotFoundError
+from lottery_numbers.application.repositories import DrawNotFoundError
 from lottery_numbers.domain.draw import Draw
 from lottery_numbers.utils import ensure_berlin_tz
 
