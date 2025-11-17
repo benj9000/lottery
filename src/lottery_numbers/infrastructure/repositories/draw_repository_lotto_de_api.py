@@ -72,7 +72,7 @@ class DrawMapper:
             draw_date=draw_response.drawDate.date(),
             lotto_6aus49_winning_numbers=[
                 item.drawNumber for item in draw_response.drawNumbersCollection
-            ],  # pyright: ignore [reportArgumentType]
+            ],  # pyright: ignore[reportArgumentType]
             super_number=draw_response.superNumber,
             spiel77_number=draw_response.game77.numbers,
             super6_number=draw_response.super6.numbers,
