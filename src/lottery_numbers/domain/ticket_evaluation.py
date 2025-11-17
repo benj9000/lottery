@@ -1,4 +1,4 @@
-from typing import ClassVar, override
+from typing import ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -7,7 +7,6 @@ from lottery_numbers.domain.games.lotto_6aus49 import Lotto6aus49Evaluation, Lot
 from lottery_numbers.domain.games.spiel77 import Spiel77Evaluation, Spiel77Evaluator
 from lottery_numbers.domain.games.super6 import Super6Evaluation, Super6Evaluator
 from lottery_numbers.domain.ticket import Ticket
-from lottery_numbers.utils import center_text
 
 
 class TicketEvaluator:
@@ -77,73 +76,3 @@ class TicketEvaluation(BaseModel):
         spiel77_win = self.spiel77_evaluation.is_winner if self.spiel77_evaluation else False
         super6_win = self.super6_evaluation.is_winner if self.super6_evaluation else False
         return lotto_6aus49_win or spiel77_win or super6_win
-
-    @override
-    def __str__(self) -> str:
-        width: int = 79
-        lines: list[str] = [
-            "═" * width,
-            "                      📊 TICKET EVALUATION",
-            "═" * width,
-            "",
-            "LOTTO 6aus49 Evaluation",
-            "─" * width,
-        ]
-
-        # Add LOTTO 6aus49 evaluation.
-        for idx, eval in enumerate(self.lotto_6aus49_evaluation, start=1):
-            eval_str: str = str(eval)
-            eval_lines: list[str] = eval_str.split("\n")
-            lines.append(f"  Pick {idx}:  {eval_lines[0]}")
-            for line in eval_lines[1:]:
-                lines.append(f"  {line}")
-
-            if idx < len(self.lotto_6aus49_evaluation):
-                lines.append("")
-
-        # Add Spiel 77 evaluation if played.
-        if self.spiel77_evaluation:
-            lines.append("")
-            lines.append("Spiel 77 Evaluation")
-            lines.append("─" * width)
-            lines.append(f"  {self.spiel77_evaluation}")
-
-        # Add SUPER 6 evaluation if played.
-        if self.super6_evaluation:
-            lines.append("")
-            lines.append("SUPER 6 Evaluation")
-            lines.append("─" * width)
-            lines.append(f"  {self.super6_evaluation}")
-
-        # Add summary.
-        lines.append("")
-        lines.append("═" * width)
-        if self.has_any_win:
-            # Collect names of games with wins.
-            winning_games: list[str] = []
-
-            if any(r.is_winner for r in self.lotto_6aus49_evaluation):
-                winning_games.append("LOTTO 6aus49")
-
-            if self.spiel77_evaluation and self.spiel77_evaluation.is_winner:
-                winning_games.append("Spiel 77")
-
-            if self.super6_evaluation and self.super6_evaluation.is_winner:
-                winning_games.append("SUPER 6")
-
-            # Format the list of games.
-            games_str: str
-            if len(winning_games) == 1:
-                games_str = winning_games[0]
-            else:
-                games_str = f"{', '.join(winning_games[:-1])} and {winning_games[-1]}"
-
-            message: str = f"🎉 CONGRATULATIONS! You won at {games_str}."
-            lines.append(center_text(message, width=width))
-        else:
-            no_win_message: str = "No winning combinations."
-            lines.append(center_text(no_win_message, width=width))
-
-        lines.append("═" * width)
-
-        return "\n".join(lines)

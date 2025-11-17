@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import ClassVar, override
+from typing import ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -46,56 +46,19 @@ class Lotto6aus49Evaluation(BaseModel):
         """Check if this is a winning combination."""
         return self.winning_class is not None
 
-    @override
-    def __str__(self) -> str:
-        lines: list[str] = []
-        matches_count: int = len(self.matching_numbers)
-
-        # Winning class line.
-        if self.winning_class is None:
-            super_text: str = " + super number" if self.super_number_matched else ""
-            plural_s: str = "s" if matches_count != 1 else ""
-            lines.append(f"No win ({matches_count} number{plural_s}{super_text})")
-        else:
-            lines.append(f"✨ WIN  Class {self.winning_class} ({self.winning_class.description})")
-
-        # Matched numbers line.
-        if matches_count > 0:
-            matches_text: str = (
-                "".join(f"[ {num:2d} ]" for num in sorted(self.matching_numbers)) or "–"
-            )
-            lines.append(f"         Matched: {matches_text}")
-
-        return "\n".join(lines)
-
 
 class Lotto6aus49WinningClass(IntEnum):
     """Winning classes for LOTTO 6aus49."""
 
-    CLASS_1 = 1
-    CLASS_2 = 2
-    CLASS_3 = 3
-    CLASS_4 = 4
-    CLASS_5 = 5
-    CLASS_6 = 6
-    CLASS_7 = 7
-    CLASS_8 = 8
-    CLASS_9 = 9
-
-    @property
-    def description(self) -> str:
-        descriptions = {
-            1: "6 numbers + super number",
-            2: "6 numbers",
-            3: "5 numbers + super number",
-            4: "5 numbers",
-            5: "4 numbers + super number",
-            6: "4 numbers",
-            7: "3 numbers + super number",
-            8: "3 numbers",
-            9: "2 numbers + super number",
-        }
-        return descriptions[self.value]
+    CLASS_1 = 1  # 6 numbers + super number.
+    CLASS_2 = 2  # 6 numbers.
+    CLASS_3 = 3  # 5 numbers + super number.
+    CLASS_4 = 4  # 5 numbers.
+    CLASS_5 = 5  # 4 numbers + super number.
+    CLASS_6 = 6  # 4 numbers.
+    CLASS_7 = 7  # 3 numbers + super number.
+    CLASS_8 = 8  # 3 numbers.
+    CLASS_9 = 9  # 2 numbers + super number.
 
     @classmethod
     def from_match_data(
@@ -108,7 +71,7 @@ class Lotto6aus49WinningClass(IntEnum):
         if matches_count < 0 or matches_count > 6:
             raise ValueError("Invalid number of matching numbers.")
 
-        mapping = {
+        mapping: dict[tuple[int, bool], Lotto6aus49WinningClass] = {
             (6, True): cls.CLASS_1,
             (6, False): cls.CLASS_2,
             (5, True): cls.CLASS_3,

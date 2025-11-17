@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import ClassVar, override
+from typing import ClassVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -48,37 +48,17 @@ class Spiel77Evaluation(BaseModel):
         """Check if this is a winning combination."""
         return self.winning_class is not None
 
-    @override
-    def __str__(self) -> str:
-        if self.winning_class is None:
-            return "No win (0 matching digits)"
-
-        return f"✨ WIN  Class {self.winning_class} ({self.winning_class.description})"
-
 
 class Spiel77WinningClass(IntEnum):
     """Winning classes for Spiel 77."""
 
-    CLASS_1 = 1
-    CLASS_2 = 2
-    CLASS_3 = 3
-    CLASS_4 = 4
-    CLASS_5 = 5
-    CLASS_6 = 6
-    CLASS_7 = 7
-
-    @property
-    def description(self) -> str:
-        descriptions = {
-            1: "7 correct digits",
-            2: "6 correct digits",
-            3: "5 correct digits",
-            4: "4 correct digits",
-            5: "3 correct digits",
-            6: "2 correct digits",
-            7: "1 correct digit",
-        }
-        return descriptions[self.value]
+    CLASS_1 = 1  # 7 correct digits.
+    CLASS_2 = 2  # 6 correct digits.
+    CLASS_3 = 3  # 5 correct digits.
+    CLASS_4 = 4  # 4 correct digits.
+    CLASS_5 = 5  # 3 correct digits.
+    CLASS_6 = 6  # 2 correct digits.
+    CLASS_7 = 7  # 1 correct digit.
 
     @classmethod
     def from_consecutive_matches(cls, matches_count: int) -> Spiel77WinningClass | None:

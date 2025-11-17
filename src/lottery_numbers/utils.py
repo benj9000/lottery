@@ -19,9 +19,3 @@ def ensure_berlin_tz(dt: datetime) -> datetime:
 
     tzinfo_berlin: ZoneInfo = ZoneInfo("Europe/Berlin")
     return dt.astimezone(tzinfo_berlin)
-
-
-def center_text(text: str, width: int = 79) -> str:
-    """Center text within a given width."""
-    padding: int = max(0, (width - len(text)) // 2)
-    return " " * padding + text

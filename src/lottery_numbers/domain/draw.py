@@ -29,27 +29,3 @@ class Draw(BaseModel):
     super6_number: str = Field(
         pattern=r"^\d{6}$", description="The winning 6-digit number for SUPER 6."
     )
-
-    @override
-    def __str__(self) -> str:
-        sorted_numbers: list[int] = sorted(self.lotto_6aus49_winning_numbers)
-        numbers_formatted: str = "".join(f"[ {num:2d} ]" for num in sorted_numbers)
-
-        date_str: str = self.draw_date.strftime("%A, %Y-%m-%d")
-
-        width: int = 79
-        lines: list[str] = [
-            "═" * width,
-            "                      🎱 LOTTERY DRAW",
-            f"                         {date_str}",
-            "═" * width,
-            "",
-            "LOTTO 6aus49",
-            f"  Winning Numbers:  {numbers_formatted}",
-            f"  Super Number:     [ {self.super_number} ]",
-            "",
-            f"Spiel 77:   {'-'.join(self.spiel77_number)}",
-            f"SUPER 6:    {'-'.join(self.super6_number)}",
-        ]
-
-        return "\n".join(lines)
