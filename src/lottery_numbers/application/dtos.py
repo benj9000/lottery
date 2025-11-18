@@ -53,7 +53,6 @@ class TicketEvaluationDTO:
     lotto_6aus49_evaluation: list[Lotto6aus49EvaluationDTO]
     spiel77_evaluation: Spiel77EvaluationDTO | None
     super6_evaluation: Super6EvaluationDTO | None
-    has_any_win: bool
 
     @classmethod
     def from_entity(cls, entity: TicketEvaluation) -> Self:
@@ -76,7 +75,6 @@ class TicketEvaluationDTO:
             lotto_6aus49_evaluation=lotto_6aus49_evaluation_dto,
             spiel77_evaluation=spiel77_evaluation,
             super6_evaluation=super6_evaluation,
-            has_any_win=entity.has_any_win,
         )
 
 

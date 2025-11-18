@@ -15,7 +15,6 @@ class TicketEvaluationPresentation:
     lotto_6aus49_evaluation: list[Lotto6aus49EvaluationPresentation]
     spiel77_evaluation: Spiel77EvaluationPresentation | None
     super6_evaluation: Super6EvaluationPresentation | None
-    has_any_win: bool
 
     @classmethod
     def from_dto(cls, dto: TicketEvaluationDTO) -> Self:
@@ -38,7 +37,6 @@ class TicketEvaluationPresentation:
             lotto_6aus49_evaluation=lotto_6aus49_evaluation,
             spiel77_evaluation=spiel77_evaluation,
             super6_evaluation=super6_evaluation,
-            has_any_win=dto.has_any_win,
         )
 
     @override
@@ -81,19 +79,16 @@ class TicketEvaluationPresentation:
         # Add summary.
         lines.append("")
         lines.append("═" * width)
-        if self.has_any_win:
-            # Collect names of games with wins.
-            winning_games: list[str] = []
+        # Collect names of games with wins.
+        winning_games: list[str] = []
+        if any(r.has_win for r in self.lotto_6aus49_evaluation):
+            winning_games.append("LOTTO 6aus49")
+        if self.spiel77_evaluation and self.spiel77_evaluation.has_win:
+            winning_games.append("Spiel 77")
+        if self.super6_evaluation and self.super6_evaluation.has_win:
+            winning_games.append("SUPER 6")
 
-            if any(r.has_win for r in self.lotto_6aus49_evaluation):
-                winning_games.append("LOTTO 6aus49")
-
-            if self.spiel77_evaluation and self.spiel77_evaluation.has_win:
-                winning_games.append("Spiel 77")
-
-            if self.super6_evaluation and self.super6_evaluation.has_win:
-                winning_games.append("SUPER 6")
-
+        if winning_games:
             # Format the list of games.
             games_str: str
             if len(winning_games) == 1:
@@ -104,8 +99,7 @@ class TicketEvaluationPresentation:
             message: str = f"🎉 CONGRATULATIONS! You won at {games_str}."
             lines.append(center_text(message, width=width))
         else:
-            no_win_message: str = "No winning combinations."
-            lines.append(center_text(no_win_message, width=width))
+            lines.append(center_text("No winning combinations.", width=width))
 
         lines.append("═" * width)
 
