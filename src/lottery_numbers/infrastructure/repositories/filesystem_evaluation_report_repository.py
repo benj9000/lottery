@@ -1,9 +1,12 @@
 from datetime import date
 from enum import Enum
 from pathlib import Path
-from typing import Any, TextIO
+from typing import Any, TextIO, override
 
-from lottery_numbers.application.repositories import EvaluationReportAlreadyExistsError
+from lottery_numbers.application.repositories import (
+    EvaluationReportAlreadyExistsError,
+    EvaluationReportRepository,
+)
 from lottery_numbers.domain.draw import Draw
 from lottery_numbers.domain.games.lotto_6aus49 import Lotto6aus49Evaluation
 from lottery_numbers.domain.games.spiel77 import Spiel77Evaluation
@@ -19,7 +22,7 @@ class ReportFormat(Enum):
     YAML = "yaml"
 
 
-class EvaluationReportRepository:
+class FilesystemEvaluationReportRepository(EvaluationReportRepository):
     """Repository that manages evaluation reports stored in different text-based formats."""
 
     def __init__(self, directory_path: Path, format: ReportFormat):
@@ -30,6 +33,7 @@ class EvaluationReportRepository:
         self._report_format: ReportFormat = format
         self._directory_path.mkdir(exist_ok=True)
 
+    @override
     def add_report(self, ticket: Ticket, draw: Draw, evaluation: TicketEvaluation) -> None:
         if ticket.draw_date != draw.draw_date:
             raise ValueError(

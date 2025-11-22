@@ -1,21 +1,22 @@
 from datetime import date, datetime
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, override
 from zoneinfo import ZoneInfo
 
 import requests
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field, PastDatetime, RootModel
 
-from lottery_numbers.application.repositories import DrawNotFoundError
+from lottery_numbers.application.repositories import DrawNotFoundError, DrawRepository
 from lottery_numbers.domain.draw import Draw
 from lottery_numbers.utils import ensure_berlin_tz
 
 
-class DrawRepositoryLottoDeApi:
+class LottoDeApiDrawRepository(DrawRepository):
     """Repository that manages lottery draw data using LOTTO.de's API."""
 
     def __init__(self):
         self._mapper: DrawMapper = DrawMapper()
 
+    @override
     def get_for_date(self, draw_date: date) -> Draw:
         url: str = self._build_url(draw_date)
         response: ApiResponse = self._fetch(url)

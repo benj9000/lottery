@@ -1,16 +1,19 @@
 from datetime import date
+from typing import override
 
+from lottery_numbers.application.repositories import TicketRepository
 from lottery_numbers.configuration import TicketConfigProtocol
 from lottery_numbers.domain.ticket import Lotto6aus49Pick, Ticket, TicketNumber
 
 
-class TicketRepositoryConfig:
+class ConfigurationTicketRepository(TicketRepository):
     """Repository that manages lottery ticket data using a configuration file."""
 
     def __init__(self, config: TicketConfigProtocol):
         self._config: TicketConfigProtocol = config
         self._mapper: TicketMapper = TicketMapper()
 
+    @override
     def get_for_date(self, draw_date: date) -> Ticket:
         return self._mapper.to_ticket(self._config, draw_date)
 
