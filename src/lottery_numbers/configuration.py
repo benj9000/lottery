@@ -49,3 +49,11 @@ def load_config(config_file_path: Path) -> ConfigProtocol:
         )
 
     return cast(ConfigProtocol, cast(object, config_module))
+
+
+def load_config_from_default_location() -> ConfigProtocol:
+    """Load the configuration from the file at the default location."""
+    filename: str = "config.py"
+    project_root: Path = Path(__file__).parent.parent.parent
+    config_file_path: Path = project_root / filename
+    return load_config(config_file_path)
