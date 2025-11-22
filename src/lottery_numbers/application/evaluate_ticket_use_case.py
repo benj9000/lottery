@@ -7,7 +7,11 @@ from lottery_numbers.application.dtos import (
     TicketDTO,
     TicketEvaluationDTO,
 )
-from lottery_numbers.application.repositories import DrawRepository, TicketRepository
+from lottery_numbers.application.repositories import (
+    DrawRepository,
+    EvaluationReportRepository,
+    TicketRepository,
+)
 from lottery_numbers.domain.draw import Draw
 from lottery_numbers.domain.ticket import Ticket
 from lottery_numbers.domain.ticket_evaluation import TicketEvaluation, TicketEvaluator
@@ -20,17 +24,25 @@ class EvaluateTicketInteractor:
         self,
         ticket_repo: TicketRepository,
         draw_repo: DrawRepository,
+        report_repo: EvaluationReportRepository,
         presenter: EvaluateTicketPresenter,
     ):
         self._ticket_repo: TicketRepository = ticket_repo
         self._draw_repo: DrawRepository = draw_repo
+        self._report_repo: EvaluationReportRepository = report_repo
         self._presenter: EvaluateTicketPresenter = presenter
 
     def execute(self, request: EvaluateTicketRequest) -> None:
+        # Fetch ticket and draw for the specified date.
         ticket: Ticket = self._ticket_repo.get_for_date(request.draw_date)
         draw: Draw = self._draw_repo.get_for_date(request.draw_date)
+
+        # Evaluate ticket against draw.
         ticket_evaluator: TicketEvaluator = TicketEvaluator()
         evaluation: TicketEvaluation = ticket_evaluator.evaluate(ticket, draw)
+
+        # Save a report.
+        self._report_repo.add_report(ticket, draw, evaluation)
 
         response: EvaluateTicketResponse = EvaluateTicketResponseMapper.to_response(
             ticket, draw, evaluation
