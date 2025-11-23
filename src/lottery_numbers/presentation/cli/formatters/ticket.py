@@ -6,7 +6,7 @@ from lottery_numbers.presentation.cli.format_utils import format_date
 
 
 @dataclass(frozen=True)
-class TicketPresentation:
+class TicketFormatter:
     ticket_number: str
     draw_date: str
     lotto_6aus49_picks: list[list[int]]

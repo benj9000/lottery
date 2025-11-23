@@ -6,7 +6,7 @@ from lottery_numbers.presentation.cli.format_utils import format_date
 
 
 @dataclass(frozen=True)
-class DrawPresentation:
+class DrawFormatter:
     draw_date: str
     lotto_6aus49_winning_numbers: frozenset[int]
     super_number: int

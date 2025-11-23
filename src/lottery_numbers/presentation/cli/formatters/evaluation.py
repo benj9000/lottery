@@ -11,24 +11,24 @@ from lottery_numbers.presentation.cli.format_utils import center_text
 
 
 @dataclass(frozen=True)
-class TicketEvaluationPresentation:
-    lotto_6aus49_evaluation: list[Lotto6aus49EvaluationPresentation]
-    spiel77_evaluation: Spiel77EvaluationPresentation | None
-    super6_evaluation: Super6EvaluationPresentation | None
+class TicketEvaluationFormatter:
+    lotto_6aus49_evaluation: list[Lotto6aus49EvaluationFormatter]
+    spiel77_evaluation: Spiel77EvaluationFormatter | None
+    super6_evaluation: Super6EvaluationFormatter | None
 
     @classmethod
     def from_dto(cls, dto: TicketEvaluationDTO) -> Self:
-        lotto_6aus49_evaluation: list[Lotto6aus49EvaluationPresentation] = [
-            Lotto6aus49EvaluationPresentation.from_dto(evaluation)
+        lotto_6aus49_evaluation: list[Lotto6aus49EvaluationFormatter] = [
+            Lotto6aus49EvaluationFormatter.from_dto(evaluation)
             for evaluation in dto.lotto_6aus49_evaluation
         ]
-        spiel77_evaluation: Spiel77EvaluationPresentation | None = (
-            Spiel77EvaluationPresentation.from_dto(dto.spiel77_evaluation)
+        spiel77_evaluation: Spiel77EvaluationFormatter | None = (
+            Spiel77EvaluationFormatter.from_dto(dto.spiel77_evaluation)
             if dto.spiel77_evaluation
             else None
         )
-        super6_evaluation: Super6EvaluationPresentation | None = (
-            Super6EvaluationPresentation.from_dto(dto.super6_evaluation)
+        super6_evaluation: Super6EvaluationFormatter | None = (
+            Super6EvaluationFormatter.from_dto(dto.super6_evaluation)
             if dto.super6_evaluation
             else None
         )
@@ -107,7 +107,7 @@ class TicketEvaluationPresentation:
 
 
 @dataclass(frozen=True)
-class Lotto6aus49EvaluationPresentation:
+class Lotto6aus49EvaluationFormatter:
     matching_numbers: list[int]
     super_number_matched: bool
     winning_class: int | None
@@ -176,7 +176,7 @@ class Lotto6aus49EvaluationPresentation:
 
 
 @dataclass(frozen=True)
-class Spiel77EvaluationPresentation:
+class Spiel77EvaluationFormatter:
     matched_digits: int
     winning_class: int | None
 
@@ -223,7 +223,7 @@ class Spiel77EvaluationPresentation:
 
 
 @dataclass(frozen=True)
-class Super6EvaluationPresentation:
+class Super6EvaluationFormatter:
     matched_digits: int
     winning_class: int | None
 
