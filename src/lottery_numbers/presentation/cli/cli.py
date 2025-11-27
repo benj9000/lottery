@@ -17,6 +17,7 @@ click_data_dir_argument = click.argument(
 
 
 @click.group()
+@click.version_option()
 def cli() -> None:
     """Lottery CLI application."""
     pass
