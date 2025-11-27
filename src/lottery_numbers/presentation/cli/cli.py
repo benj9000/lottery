@@ -8,6 +8,7 @@ from lottery_numbers.infrastructure.repositories.filesystem_evaluation_report_re
 )
 from lottery_numbers.presentation.cli.cli_config import DEFAULT_REPORT_FORMAT
 from lottery_numbers.presentation.cli.commands.evaluate_ticket import evaluate_ticket
+from lottery_numbers.presentation.cli.commands.init_data_directory import init_data_dir
 
 click_data_dir_argument = click.argument(
     "data-dir",
@@ -19,6 +20,13 @@ click_data_dir_argument = click.argument(
 def cli() -> None:
     """Lottery CLI application."""
     pass
+
+
+@cli.command()
+@click_data_dir_argument
+def init(data_dir: Path) -> None:
+    """Initialize the data directory at DATA_DIR."""
+    init_data_dir(data_dir)
 
 
 @cli.command()
