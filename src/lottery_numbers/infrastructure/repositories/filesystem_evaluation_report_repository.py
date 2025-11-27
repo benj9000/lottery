@@ -25,13 +25,13 @@ class ReportFormat(Enum):
 class FilesystemEvaluationReportRepository(EvaluationReportRepository):
     """Repository that manages evaluation reports stored in different text-based formats."""
 
-    def __init__(self, directory_path: Path, format: ReportFormat):
-        """Initialize the repository with a path to the storage directory and a format."""
-        if not directory_path.exists():
-            raise FileNotFoundError(f"Report directory not found: {directory_path}.")
-        self._directory_path: Path = directory_path
+    def __init__(self, reports_dir: Path, format: ReportFormat):
+        """Initialize the repository with a path to the reports directory and a format."""
+        if not reports_dir.exists():
+            raise FileNotFoundError(f"Reports directory not found: {reports_dir}.")
+        self._reports_dir: Path = reports_dir
         self._report_format: ReportFormat = format
-        self._directory_path.mkdir(exist_ok=True)
+        self._reports_dir.mkdir(exist_ok=True)
 
     @override
     def add_report(self, ticket: Ticket, draw: Draw, evaluation: TicketEvaluation) -> None:
@@ -54,30 +54,29 @@ class FilesystemEvaluationReportRepository(EvaluationReportRepository):
         Raises a `EvaluationReportAlreadyExistsError` when an evaluation report already exists for
         the specified date.
         """
-        subdirectory_path: Path = self._get_subdirectory_path(draw_date)
-        file_path: Path = self._get_file_path(subdirectory_path, draw_date)
-        if file_path.exists():
-            message: str = f"Evaluation report already exists for date {draw_date} at {file_path}."
+        subdir: Path = self._get_subdir_path(draw_date)
+        file: Path = self._get_file_path(subdir, draw_date)
+        if file.exists():
+            message: str = f"Evaluation report already exists for date {draw_date} at {file}."
             raise EvaluationReportAlreadyExistsError(draw_date, message)
 
-        if not subdirectory_path.exists():
-            subdirectory_path.mkdir()
+        if not subdir.exists():
+            subdir.mkdir()
 
-        return file_path
+        return file
 
     def _get_file_path(self, directory_path: Path, draw_date: date) -> Path:
         """Get the file path for a specific draw date."""
         extension = self._report_format.value
-        # return self._get_subdirectory_path(draw_date) / f"{draw_date.isoformat()}.{extension}"
         return directory_path / f"{draw_date.isoformat()}.{extension}"
 
-    def _get_subdirectory_path(self, draw_date: date) -> Path:
+    def _get_subdir_path(self, draw_date: date) -> Path:
         """Get the subdirectory path for a specific draw date."""
-        return self._directory_path / str(draw_date.year)
+        return self._reports_dir / str(draw_date.year)
 
     def _write_report_dict_to_file(self, report_dict: dict[str, Any], file_path: Path) -> None:  # pyright: ignore[reportExplicitAny]
         """Write the report dict into the file at the specified path."""
-        with open(file_path, "w", encoding="utf-8") as f:
+        with file_path.open("w", encoding="utf-8") as f:
             match self._report_format:
                 case ReportFormat.JSON:
                     self._dump_json(report_dict, f)
