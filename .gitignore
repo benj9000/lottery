@@ -8,8 +8,5 @@ __pycache__/
 dist/
 *.egg-info/
 
-# Configuration.
-config.py
-
 # Data.
 data/

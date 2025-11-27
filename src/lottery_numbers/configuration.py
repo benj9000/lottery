@@ -2,11 +2,11 @@ from importlib.machinery import ModuleSpec
 from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from types import ModuleType
-from typing import Literal, Protocol, cast, get_type_hints
+from typing import Protocol, cast, get_type_hints
 
 
 class TicketConfigProtocol(Protocol):
-    """A subconfiguration that defines the numbers and games that are played."""
+    """A configuration that defines a ticket, i.e., the numbers and games that are played."""
 
     ticket_number: str
     picks: list[tuple[int, int, int, int, int, int]]
@@ -14,46 +14,34 @@ class TicketConfigProtocol(Protocol):
     play_super6: bool
 
 
-class ReportConfigProtocol(Protocol):
-    """A subconfiguration that defines how and where to store reports."""
+def load_ticket_config(config_file: Path) -> TicketConfigProtocol:
+    """Load the ticket configuration from the file at the specified path."""
 
-    report_directory: Path
-    report_format: Literal["json", "yaml"]
+    if not config_file.exists() or not config_file.is_file():
+        raise FileNotFoundError(f"Configuration file not found at {config_file}.")
 
-
-class ConfigProtocol(TicketConfigProtocol, ReportConfigProtocol, Protocol):
-    """A full application configuration."""
-
-    ...
-
-
-def load_config(config_file_path: Path) -> ConfigProtocol:
-    """Load the configuration from the file at the given path."""
-
-    if not config_file_path.exists() or not config_file_path.is_file():
-        raise FileNotFoundError(f"Configuration file not found at {config_file_path}.")
-
-    spec: ModuleSpec | None = spec_from_file_location("config", config_file_path)
+    spec: ModuleSpec | None = spec_from_file_location("config", config_file)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Failed to load module spec from {config_file_path}")
+        raise ImportError(f"Failed to load module spec from {config_file}")
 
     config_module: ModuleType = module_from_spec(spec)
     spec.loader.exec_module(config_module)
 
     # Validate all required attributes from the protocol.
-    required_attrs = get_type_hints(ConfigProtocol).keys()
+    required_attrs = get_type_hints(TicketConfigProtocol).keys()
     missing_attrs = [attr for attr in required_attrs if not hasattr(config_module, attr)]
     if missing_attrs:
+        missing_attrs_str = ", ".join(missing_attrs)
         raise AttributeError(
-            f"Config module is missing required attributes: {', '.join(missing_attrs)}"
+            f"Ticket config module is missing required attributes: {missing_attrs_str}"
         )
 
-    return cast(ConfigProtocol, cast(object, config_module))
+    return cast(TicketConfigProtocol, cast(object, config_module))
 
 
-def load_config_from_default_location() -> ConfigProtocol:
+def load_config_from_default_location() -> TicketConfigProtocol:
     """Load the configuration from the file at the default location."""
     filename: str = "config.py"
     project_root: Path = Path(__file__).parent.parent.parent
     config_file_path: Path = project_root / filename
-    return load_config(config_file_path)
+    return load_ticket_config(config_file_path)

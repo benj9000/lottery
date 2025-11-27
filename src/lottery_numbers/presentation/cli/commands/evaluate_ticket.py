@@ -11,34 +11,44 @@ from lottery_numbers.application.repositories import (
     EvaluationReportRepository,
     TicketRepository,
 )
-from lottery_numbers.configuration import ConfigProtocol, load_config_from_default_location
+from lottery_numbers.configuration import TicketConfigProtocol, load_ticket_config
 from lottery_numbers.infrastructure.repositories.configuration_ticket_repository import (
     ConfigurationTicketRepository,
 )
-from lottery_numbers.infrastructure.repositories.draw_repository_mock import DrawRepositoryMock
 from lottery_numbers.infrastructure.repositories.filesystem_evaluation_report_repository import (
     FilesystemEvaluationReportRepository,
     ReportFormat,
 )
+from lottery_numbers.infrastructure.repositories.lotto_de_api_draw_repository import (
+    LottoDeApiDrawRepository,
+)
+from lottery_numbers.infrastructure.repositories.noop_evaluation_report_repository import (
+    NoopEvaluationReportRepository,
+)
+from lottery_numbers.presentation.cli.cli_config import REPORTS_SUBDIR_NAME, TICKET_CONFIG_FILENAME
 from lottery_numbers.presentation.cli.evaluate_ticket_presenter import (
     CLIEvaluateTicketPresenter,
 )
 
 
-def evaluate_ticket(draw_date: date) -> None:
+def evaluate_ticket(
+    data_dir: Path,
+    draw_date: date,
+    create_report: bool,
+    report_format: ReportFormat,
+) -> None:
     """Command to evaluate the ticket from the configuration against the draw on the given date."""
-    config: ConfigProtocol = load_config_from_default_location()
-
+    config: TicketConfigProtocol = load_ticket_config(data_dir / TICKET_CONFIG_FILENAME)
     ticket_repo: TicketRepository = ConfigurationTicketRepository(config)
 
-    draw_repo: DrawRepository = DrawRepositoryMock()  # TODO replace mock
-    # draw_repo: DrawRepository = LottoDeApiDrawRepository()
+    draw_repo: DrawRepository = LottoDeApiDrawRepository()
 
-    report_directory_path: Path = config.report_directory
-    report_format: ReportFormat = ReportFormat(config.report_format)
-    report_repo: EvaluationReportRepository = FilesystemEvaluationReportRepository(
-        report_directory_path, report_format
-    )
+    report_repo: EvaluationReportRepository
+    if create_report:
+        reports_dir: Path = data_dir / REPORTS_SUBDIR_NAME
+        report_repo = FilesystemEvaluationReportRepository(reports_dir, report_format)
+    else:
+        report_repo = NoopEvaluationReportRepository()
 
     presenter: EvaluateTicketPresenter = CLIEvaluateTicketPresenter()
 
@@ -46,5 +56,4 @@ def evaluate_ticket(draw_date: date) -> None:
         ticket_repo, draw_repo, report_repo, presenter
     )
     request: EvaluateTicketRequest = EvaluateTicketRequest(draw_date)
-
     use_case.execute(request)

@@ -1,6 +1,4 @@
-from pathlib import Path
-from typing import Literal
-
+# TODO Fill out these variables with your lottery ticket data and remove this comment.
 ticket_number: str = "1234567"
 picks: list[tuple[int, int, int, int, int, int]] = [
     (1, 2, 3, 4, 5, 6),
@@ -9,6 +7,3 @@ picks: list[tuple[int, int, int, int, int, int]] = [
 ]
 play_spiel77: bool = True
 play_super6: bool = True
-
-report_directory: Path = Path(__file__).parent / "data" / "reports"
-report_format: Literal["json", "yaml"] = "json"
