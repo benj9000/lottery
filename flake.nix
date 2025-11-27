@@ -1,5 +1,5 @@
 {
-  description = "Lottery numbers";
+  description = "Evaluating lottery tickets";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";

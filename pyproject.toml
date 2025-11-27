@@ -1,10 +1,10 @@
 [project]
-name = "lottery-numbers"
+name = "lottery"
 version = "0.1.0"
-description = "tba"
+description = "Evaluating lottery tickets."
 readme = "README.md"
 authors = [
-    { name = "benj9000", email = "49900294+benj9000@users.noreply.github.com" }
+    { name = "benj9000", email = "49900294+benj9000@users.noreply.github.com" },
 ]
 requires-python = ">=3.14"
 dependencies = [
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-lottery-numbers = "lottery_numbers.presentation.cli.cli:cli"
+lottery-ticket = "lottery.presentation.cli.cli:cli"
 
 [build-system]
 requires = ["uv_build>=0.8.23,<0.9.0"]
