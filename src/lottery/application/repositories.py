@@ -9,7 +9,7 @@ from lottery.domain.ticket_evaluation import TicketEvaluation
 class DrawRepository(Protocol):
     """Repositories that manage lottery draws."""
 
-    def get_for_date(self, draw_date: date) -> Draw:
+    def get_by_date(self, date: date) -> Draw:
         """
         Get the draw that occurred on the specified date.
 

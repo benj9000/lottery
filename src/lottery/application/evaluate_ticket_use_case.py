@@ -31,7 +31,7 @@ class EvaluateTicketInteractor:
     def execute(self, request: EvaluateTicketRequest) -> None:
         # Fetch ticket and draw for the specified date.
         ticket: Ticket = self._ticket_repo.get_for_date(request.draw_date)
-        draw: Draw = self._draw_repo.get_for_date(request.draw_date)
+        draw: Draw = self._draw_repo.get_by_date(request.draw_date)
 
         # Evaluate ticket against draw.
         ticket_evaluator: TicketEvaluator = TicketEvaluator()

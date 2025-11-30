@@ -17,15 +17,15 @@ class LottoDeApiDrawRepository(DrawRepository):
         self._mapper: DrawMapper = DrawMapper()
 
     @override
-    def get_for_date(self, draw_date: date) -> Draw:
-        url: str = self._build_url(draw_date)
+    def get_by_date(self, date: date) -> Draw:
+        url: str = self._build_url(date)
         response: ApiResponse = self._fetch(url)
         draws: list[Draw] = self._mapper.to_draws(response)
         if len(draws) == 0:
-            raise DrawNotFoundError(draw_date)
+            raise DrawNotFoundError(date)
         if len(draws) > 1:
             raise ValueError(
-                f"API returned data for multiples draws for date {draw_date}; expected exactly one."
+                f"API returned data for multiples draws for date {date}; expected exactly one."
             )
         return draws[0]
 
