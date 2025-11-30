@@ -1,5 +1,5 @@
 from datetime import date, datetime
-from typing import Annotated, ClassVar, override
+from typing import Annotated, Any, ClassVar, override
 from zoneinfo import ZoneInfo
 
 import requests
@@ -13,13 +13,14 @@ from lottery.utils import ensure_berlin_tz
 class LottoDeApiDrawRepository(DrawRepository):
     """Repository that manages lottery draw data using LOTTO.de's API."""
 
-    def __init__(self):
-        self._mapper: DrawMapper = DrawMapper()
+    def __init__(self, client: LottoDeApiClient | None = None, mapper: DrawMapper | None = None):
+        self._client: LottoDeApiClient = client or LottoDeApiClient()
+        self._mapper: DrawMapper = mapper or DrawMapper()
 
     @override
     def get_by_date(self, date: date) -> Draw:
-        url: str = self._build_url(date)
-        response: ApiResponse = self._fetch(url)
+        raw_data: list[dict[str, Any]] = self._client.fetch_draw_by_date(date)  # pyright: ignore[reportExplicitAny]
+        response: ApiResponse = ApiResponse.model_validate(raw_data)
         draws: list[Draw] = self._mapper.to_draws(response)
         if len(draws) == 0:
             raise DrawNotFoundError(date)
@@ -29,33 +30,39 @@ class LottoDeApiDrawRepository(DrawRepository):
             )
         return draws[0]
 
-    @staticmethod
-    def _build_url(draw_date: date) -> str:
-        """
-        Build the URL for an API call to get the lottery draw data of the given day.
 
-        Example URL: https://www.lotto.de/api/stats/entities.lotto/draws/946681200000.
-        """
+class LottoDeApiClient:
+    """A HTTP client for the LOTTO.de API."""
 
-        base_url: str = "https://www.lotto.de/api/stats/entities.lotto/draws/"
+    _BASE_URL: str = "https://www.lotto.de/api/stats/entities.lotto"
 
-        # The API accepts a UNIX timestamp with milliseconds as a path parameter and returns the lottery
-        # draw data for the day of the UNIX timestamp. The exact millisecond does not matter, it is only
-        # about the day to which it belongs.
-        midnight: datetime = datetime.combine(
-            draw_date, datetime.min.time(), ZoneInfo("Europe/Berlin")
-        )
-        timestamp_seconds: int = int(midnight.timestamp())
-        timestamp_milliseconds: int = timestamp_seconds * 1_000
+    def fetch_draw_by_date(self, draw_date: date) -> list[dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
+        """Fetch the data for the draw that occured on the specified date."""
+        url: str = self._build_url_for_date(draw_date)
+        return self._fetch(url)
 
-        return f"{base_url}{timestamp_milliseconds}"
-
-    @staticmethod
-    def _fetch(url: str) -> ApiResponse:
-        """Fetch data via the lotto.de API using the provided URL."""
-        response: requests.Response = requests.get(url, timeout=5)
+    def _fetch(self, url: str, timeout: int = 5) -> list[dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
+        """Fetch data via the LOTTO.de API using the provided URL."""
+        response: requests.Response = requests.get(url, timeout=timeout)
         response.raise_for_status()
-        return ApiResponse.model_validate_json(response.text)
+        return response.json()  # pyright: ignore[reportAny]
+
+    def _build_url_for_date(self, date: date) -> str:
+        """Build the URL for an API call to get the lottery draw data of the specified day."""
+
+        timestamp_ms: int = self._date_to_timestamp_with_ms(date)
+        return f"{self._BASE_URL}/draws/{timestamp_ms}"
+
+    def _date_to_timestamp_with_ms(self, date: date) -> int:
+        """
+        Convert the specified date to a UNIX timestamp with milliseconds.
+
+        The API accepts a UNIX timestamp with milliseconds as a path parameter and returns the
+        lottery draw data for the day of the UNIX timestamp. The exact millisecond does not matter,
+        it is only about the day to which it belongs.
+        """
+        midnight: datetime = datetime.combine(date, datetime.min.time(), ZoneInfo("Europe/Berlin"))
+        return int(midnight.timestamp()) * 1_000
 
 
 class DrawMapper:
