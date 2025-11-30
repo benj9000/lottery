@@ -91,16 +91,16 @@ class LottoDeApiClient:
 
 
 class DrawMapper:
-    """Mapper for converting lotto.de API responses to `Draw` entities."""
+    """Mapper for converting LOTTO.de API responses to `Draw` entities."""
 
     @staticmethod
     def to_draws(response: ApiResponse) -> list[Draw]:
-        """Map lotto.de API response to a list of `Draw` entities."""
+        """Map LOTTO.de API response to a list of `Draw` entities."""
         return [DrawMapper.to_draw(draw) for draw in response.root]
 
     @staticmethod
     def to_draw(draw_response: DrawResponse) -> Draw:
-        """Map a single draw from a lotto.de API response to a `Draw` entity."""
+        """Map a single draw from a LOTTO.de API response to a `Draw` entity."""
         return Draw(
             draw_date=draw_response.drawDate.date(),
             lotto_6aus49_winning_numbers=[
