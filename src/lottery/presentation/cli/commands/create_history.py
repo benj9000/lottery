@@ -22,7 +22,7 @@ from lottery.infrastructure.repositories.lotto_de_api_draw_repository import (
     LottoDeApiDrawRepository,
 )
 from lottery.presentation.cli.cli_config import REPORTS_SUBDIR_NAME, TICKET_CONFIG_FILENAME
-from lottery.presentation.cli.evaluate_ticket_over_history_presenter import (
+from lottery.presentation.cli.presenters.evaluate_ticket_over_history_presenter import (
     CLIEvaluateTicketOverHistoryPresenter,
 )
 

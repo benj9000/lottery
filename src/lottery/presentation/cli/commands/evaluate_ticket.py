@@ -26,7 +26,7 @@ from lottery.infrastructure.repositories.noop_evaluation_report_repository impor
     NoopEvaluationReportRepository,
 )
 from lottery.presentation.cli.cli_config import REPORTS_SUBDIR_NAME, TICKET_CONFIG_FILENAME
-from lottery.presentation.cli.evaluate_ticket_presenter import CLIEvaluateTicketPresenter
+from lottery.presentation.cli.presenters.evaluate_ticket_presenter import CLIEvaluateTicketPresenter
 
 
 def evaluate_ticket(
