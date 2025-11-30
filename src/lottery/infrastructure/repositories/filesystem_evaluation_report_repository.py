@@ -40,7 +40,7 @@ class FilesystemEvaluationReportRepository(EvaluationReportRepository):
                 f"Draw dates of ticket ({ticket.draw_date}) and draw ({draw.draw_date}) do not match."
             )
 
-        draw_date: date = ticket.draw_date
+        draw_date: date = draw.draw_date
         file_path: Path = self._init_file_path(draw_date)
         report_dict: dict[str, Any] = ReportDictFactory().create(  # pyright: ignore[reportExplicitAny]
             draw_date, draw, ticket, evaluation
