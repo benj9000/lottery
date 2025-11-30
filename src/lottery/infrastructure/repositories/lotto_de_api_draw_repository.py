@@ -30,6 +30,12 @@ class LottoDeApiDrawRepository(DrawRepository):
             )
         return draws[0]
 
+    @override
+    def get_since_date(self, date: date) -> list[Draw]:
+        raw_data: list[dict[str, Any]] = self._client.fetch_all_draws()  # pyright: ignore[reportExplicitAny]
+        response: ApiResponse = ApiResponse.model_validate(raw_data)
+        return self._mapper.to_draws(response)
+
 
 class LottoDeApiClient:
     """A HTTP client for the LOTTO.de API."""
@@ -40,6 +46,10 @@ class LottoDeApiClient:
         """Fetch the data for the draw that occured on the specified date."""
         url: str = self._build_url_for_date(draw_date)
         return self._fetch(url)
+
+    def fetch_all_draws(self) -> list[dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
+        """Fetch the data for all avaiable draws."""
+        return self._fetch(self._BASE_URL, 30)
 
     def _fetch(self, url: str, timeout: int = 5) -> list[dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
         """Fetch data via the LOTTO.de API using the provided URL."""

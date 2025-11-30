@@ -17,6 +17,10 @@ class DrawRepository(Protocol):
         """
         ...
 
+    def get_since_date(self, date: date) -> list[Draw]:
+        """Get the draws that occurred on or after the specified date."""
+        ...
+
 
 class DrawNotFoundError(Exception):
     """To be raised when no lottery draw can be found for the requested date."""
