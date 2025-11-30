@@ -45,7 +45,22 @@ class LottoDeApiClient:
         """Fetch data via the LOTTO.de API using the provided URL."""
         response: requests.Response = requests.get(url, timeout=timeout)
         response.raise_for_status()
-        return response.json()  # pyright: ignore[reportAny]
+        return self._filter(response.json())  # pyright: ignore[reportAny]
+
+    def _filter(self, raw_data: list[dict[str, Any]]) -> list[dict[str, Any]]:  # pyright: ignore[reportExplicitAny]
+        """
+        Filter the raw API resonse data.
+
+        The lottery rules and draw frequency changed over time. We filter out the draw data that is
+        not compatible with the today's rules.
+
+        See https://www.lotto.de/lotto-6aus49/ueber/historie.
+        """
+        # In 2013, the winning classes were adjusted, such that we will get valid evaluations only
+        # for draws after that date.
+        cutoff_timestamp_ms: int = self._date_to_timestamp_with_ms(date(2014, 1, 1))
+        filtered_data = [item for item in raw_data if item["drawDate"] >= cutoff_timestamp_ms]
+        return filtered_data
 
     def _build_url_for_date(self, date: date) -> str:
         """Build the URL for an API call to get the lottery draw data of the specified day."""
