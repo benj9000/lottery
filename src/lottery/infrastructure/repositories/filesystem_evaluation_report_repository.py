@@ -214,7 +214,7 @@ class ReportDictFactory:
 
         return (
             f"SUPER 6: winning class {evaluation.winning_class} "
-            "({evaluation.matched_digits} digits)"
+            f"({evaluation.matched_digits} digits)"
         )
 
     @staticmethod
