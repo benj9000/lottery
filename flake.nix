@@ -39,13 +39,8 @@
         };
 
         workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = src; };
-        overlay = workspace.mkPyprojectOverlay {
-          sourcePreference = "wheel";
-        };
-        pyprojectOverrides = final: prev: {
-          # Add build fixups, if needed, see
-          # https://pyproject-nix.github.io/pyproject.nix/builders/overriding.html#wheels.
-        };
+        overlay = workspace.mkPyprojectOverlay { sourcePreference = "wheel"; };
+
         mkPythonSet = pythonPackage:
           let
             baseSet = pkgs.callPackage pyproject-nix.build.packages { python = pythonPackage; };
@@ -53,7 +48,6 @@
           baseSet.overrideScope (lib.composeManyExtensions [
             pyproject-build-systems.overlays.default
             overlay
-            pyprojectOverrides
           ]);
 
         mkPythonPackage = packageName: pythonPackage:
