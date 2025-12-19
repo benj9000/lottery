@@ -29,6 +29,7 @@
         src = ./.;
         pyproject = pyproject-nix.lib.project.loadUVPyproject { projectRoot = src; };
         projectName = pyproject.pyproject.project.name;
+        projectScripts = builtins.attrNames (pyproject.pyproject.project.scripts or { });
 
         pkgs = nixpkgs.legacyPackages.${system};
         defaultPythonPackage = pkgs.python314;
@@ -50,7 +51,7 @@
             overlay
           ]);
 
-        mkPythonPackage = packageName: pythonPackage:
+        mkPythonPackage = pythonPackageName: pythonPackage:
           let
             inherit (pkgs.callPackages pyproject-nix.build.util { }) mkApplication;
             pythonSet = mkPythonSet pythonPackage;
@@ -60,10 +61,15 @@
             package = pythonSet."${projectName}";
           };
 
-        mkApp = packageName: package:
+        mkApp = packageName: package: scriptName:
           lib.nameValuePair
-            (if packageName == "default" then packageName else "${packageName}-${package.meta.mainProgram}")
-            { type = "app"; program = lib.getExe package; };
+            (if packageName == "default" then packageName else scriptName)
+            { type = "app"; program = "${package}/bin/${scriptName}"; };
+
+        mkAppsForAllScripts = packageName: package:
+          builtins.listToAttrs (
+            builtins.map (scriptName: mkApp packageName package scriptName) projectScripts
+          );
 
         mkPythonShell = devShellName: pythonPackage:
           let
@@ -93,9 +99,9 @@
             '';
           };
       in
-      {
+      rec {
         packages = lib.mapAttrs mkPythonPackage pythonPackages;
-        apps = lib.mapAttrs' mkApp self.packages.${system};
+        apps = lib.concatMapAttrs mkAppsForAllScripts packages;
         devShells = lib.mapAttrs mkPythonShell pythonPackages;
       }
     );
